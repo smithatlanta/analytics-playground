@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	kafka "github.com/segmentio/kafka-go"
@@ -45,15 +46,20 @@ func getKafkaWriter(kafkaURL, topic string) *kafka.Writer {
 }
 
 func main() {
+	kafkaURL := os.Getenv("KAFKA_URL")
+	kafkaTopic := os.Getenv("KAFKA_TOPIC")
+
+	log.Println("Running with the following parameters:")
+	log.Printf("KAFKA_URL: %s", kafkaURL)
+	log.Printf("KAFKA_TOPIC: %s", kafkaTopic)
+
 	// get kafka writer using environment variables.
-	kafkaURL := "localhost:32886"
-	topic := "events"
-	kafkaWriter := getKafkaWriter(kafkaURL, topic)
+	kafkaWriter := getKafkaWriter(kafkaURL, kafkaTopic)
 
 	defer kafkaWriter.Close()
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/healthcheck", healthCheck).Methods("GET")
 	router.HandleFunc("/v1/batch", batchpost(kafkaWriter)).Methods("POST")
-	log.Fatal(http.ListenAndServe(":3000", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

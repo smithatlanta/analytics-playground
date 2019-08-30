@@ -7,11 +7,9 @@ services:
   kafka:
     build: .
     ports:
-      - "9092"
+      - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 10.1.10.186
-      # KAFKA_ADVERTISED_HOST_NAME: 10.189.66.134
-      # KAFKA_ADVERTISED_HOST_NAME: 10.0.74.236
+      KAFKA_ADVERTISED_HOST_NAME: host.docker.internal
       KAFKA_CREATE_TOPICS: "test:1:1,quickstart-offsets:1:1,quickstart-config:1:1,quickstart-status:1:1,quickstart-datain:1:1,quickstart-dataout:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
@@ -24,15 +22,6 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
       SCHEMA_REGISTRY_HOST_NAME: "localhost"
       SCHEMA_REGISTRY_LISTENERS: "http://localhost:8081"
-  # kafka-rest:
-  #   image: confluentinc/cp-kafka-rest:latest
-  #   ports:
-  #     - "8082:8082"
-  #   environment:  
-  #     KAFKA_REST_ZOOKEEPER_CONNECT: "zookeeper:2181"
-  #     KAFKA_REST_LISTENERS: "http://localhost:8082"
-  #     KAFKA_REST_SCHEMA_REGISTRY_URL: "schema-registry:8081"
-  #     KAFKA_REST_HOST_NAME: "kafka-rest"
   kafka-connect:
     image: confluentinc/cp-kafka-connect:latest
     ports:
@@ -45,10 +34,8 @@ services:
       CONNECT_OFFSET_STORAGE_TOPIC: "quickstart-offsets"
       CONNECT_STATUS_STORAGE_TOPIC: "quickstart-status"
       CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
-      # CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "true"
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "schema-registry:8081"
       CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
-      # CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "true"
       CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "schema-registry:8081"
       CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
@@ -67,3 +54,11 @@ services:
       CONNECT_REST_HOST_NAME: "kafka-connect"
     volumes:      
       - /tmp/quickstart:/tmp/quickstart
+  analytics-service:
+    image: analytics-service
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_URL: "kafka:9092"
+      KAFKA_TOPIC: "events"
+
