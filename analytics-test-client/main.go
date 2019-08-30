@@ -3,14 +3,16 @@ package main
 import (
 	"time"
 
-	"github.com/smithatlanta/analytics/analytics-test-client/analytics-go"
+	"gopkg.in/segmentio/analytics-go.v3"
 )
 
 func main() {
-	client := analytics.New("h97jamjwbh")
-	client.Interval = 30 * time.Second
-	client.Size = 100
-	client.Verbose = true
+	client, _ := analytics.NewWithConfig("h97jamjwbh", analytics.Config{
+		Endpoint:  "http://localhost:8080",
+		Interval:  30 * time.Second,
+		BatchSize: 100,
+		Verbose:   true,
+	})
 
 	done := time.After(3 * time.Second)
 	tick := time.Tick(50 * time.Millisecond)
@@ -22,7 +24,7 @@ out:
 			println("exiting")
 			break out
 		case <-tick:
-			client.Track(&analytics.Track{
+			client.Enqueue(analytics.Track{
 				Event:  "Download",
 				UserId: "123456",
 				Properties: map[string]interface{}{

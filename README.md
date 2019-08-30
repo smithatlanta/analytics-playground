@@ -5,12 +5,11 @@
 ## analytics-platform
 
 - This contains the code to spin up docker containers for kafka(including zookeeper, kafka, schema registry, and kafka connect)
-- It also conatins a kafka-go directory which has some tests to run.  This will be refined.
 - The goal is to allow us to send data to kafka and have it write out to a file sink(local directory). We want to mimic how kinesis writes out to a firehose ends up in s3.
 
 ## analytics-service
 
-- This contains some gorilla mux code(REST endpoints) to allow clients to call identify and track.  It will eventually use the kafka-go client supplied by segment to send to kafka.
+- This contains 2 REST endpoints to allow clients to call identify and track.  It uses gorilla mux and kafka-go.
 
 ## analytics-test-client
 
