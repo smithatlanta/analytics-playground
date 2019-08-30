@@ -19,3 +19,7 @@
 ## analytics-test-website
 
 - This will eventually contain a simple website using a hacked version of the analytics.js library to send to the analytics service.
+
+## Version 1
+
+![alt text](./AnalyticsPlatformLocal_8_30_19.jpg)

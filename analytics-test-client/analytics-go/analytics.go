@@ -22,7 +22,7 @@ import (
 const Version = "2.1.0"
 
 // Endpoint for the Segment API.
-const Endpoint = "https://api.segment.io"
+const Endpoint = "http://localhost:3000"
 
 // DefaultContext of message batches.
 var DefaultContext = map[string]interface{}{

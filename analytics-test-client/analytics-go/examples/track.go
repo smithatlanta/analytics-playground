@@ -1,7 +1,10 @@
 package main
 
-import "github.com/segmentio/analytics-go"
-import "time"
+import (
+	"time"
+
+	"github.com/smithatlanta/analytics/analytics-test-client/analytics-go"
+)
 
 func main() {
 	client := analytics.New("h97jamjwbh")

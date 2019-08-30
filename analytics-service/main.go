@@ -7,35 +7,53 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	kafka "github.com/segmentio/kafka-go"
 )
 
-func main() {
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/healthcheck", HealthCheck).Methods("GET")
-	router.HandleFunc("/identify", Identify).Methods("POST")
-	router.HandleFunc("/track", Track).Methods("POST")
-	log.Fatal(http.ListenAndServe(":3000", nil))
-}
-
-// HealthCheck -- To provide a response for the healthcheck
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
+// healthCheck -- To provide a response for the healthcheck
+func healthCheck(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Alive")
 }
 
-// Identify -- To handle identify calls from the client
-func Identify(w http.ResponseWriter, r *http.Request) {
-	_, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		fmt.Fprintf(w, "")
-	}
-	w.WriteHeader(http.StatusCreated)
+// batchpost -- To handle identify calls from the client
+func batchpost(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.Request) {
+	return http.HandlerFunc(func(wrt http.ResponseWriter, req *http.Request) {
+		log.Println(req.Body)
+		body, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		msg := kafka.Message{
+			Key:   []byte(fmt.Sprintf("address-%s", req.RemoteAddr)),
+			Value: body,
+		}
+		err = kafkaWriter.WriteMessages(req.Context(), msg)
+
+		if err != nil {
+			wrt.Write([]byte(err.Error()))
+			log.Fatalln(err)
+		}
+	})
 }
 
-// Track -- To handle track calls from the client
-func Track(w http.ResponseWriter, r *http.Request) {
-	_, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		fmt.Fprintf(w, "")
-	}
-	w.WriteHeader(http.StatusCreated)
+func getKafkaWriter(kafkaURL, topic string) *kafka.Writer {
+	return kafka.NewWriter(kafka.WriterConfig{
+		Brokers:  []string{kafkaURL},
+		Topic:    topic,
+		Balancer: &kafka.LeastBytes{},
+	})
+}
+
+func main() {
+	// get kafka writer using environment variables.
+	kafkaURL := "localhost:32886"
+	topic := "events"
+	kafkaWriter := getKafkaWriter(kafkaURL, topic)
+
+	defer kafkaWriter.Close()
+
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/healthcheck", healthCheck).Methods("GET")
+	router.HandleFunc("/v1/batch", batchpost(kafkaWriter)).Methods("POST")
+	log.Fatal(http.ListenAndServe(":3000", router))
 }
