@@ -1,9 +1,0 @@
-version: '2'
-services:
-  analytics-service:
-    image: analytics-service
-    ports:
-      - "8080:8080"
-    environment:
-      KAFKA_URL: localhost:9092
-      KAFKA_TOPIC: "events"
