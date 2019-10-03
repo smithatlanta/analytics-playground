@@ -30,19 +30,8 @@
 
 - In a real world, high event volume stack, I would probably have a process that loads the events into a Snowflake(or other columnar database) and then use a tool like Looker(or tableau) to view the results.
 
-## Version 1 Arch
-
-- Just the basics.
-
-![alt text](./arch_images/AnalyticsPlatformLocal_8_30_19.jpg)
-
-## Version 1 Arch via S3
-
-![alt text](./arch_images/AnalyticsPlatformS3_10_3_19.jpg)
-
 ## Final Vision in AWS
 
 - Analytics Platform is black boxed because in theory it could be any event aggregation platform.
 
 ![alt text](./arch_images/AnalyticsTestingPlatform_8_23_19.jpg)
-

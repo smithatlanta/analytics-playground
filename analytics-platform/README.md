@@ -1,5 +1,18 @@
 # analytics-platform
 
+## Arch Diagrams
+
+## Version 1 Analytics Platform
+
+- Just the basics.
+
+![alt text](../arch_images/AnalyticsPlatformLocal_8_30_19.jpg)
+
+## Version 1 Arch via S3
+
+![alt text](../arch_images/AnalyticsPlatformS3_10_3_19.jpg)
+
+
 ## How to start things up
 
 1. Go to the analytics-service directory first and build that service.
