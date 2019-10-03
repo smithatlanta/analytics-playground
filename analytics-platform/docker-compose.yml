@@ -94,8 +94,8 @@ services:
       CONNECT_PLUGIN_PATH: "/usr/share/java"
     volumes:      
       - /tmp/quickstart:/tmp/quickstart
-  analytics-service:
-    image: analytics-service
+  api-service:
+    image: api-service
     ports:
       - "8080:8080"
     networks:
