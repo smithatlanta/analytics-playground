@@ -99,7 +99,6 @@
 
 4. Keep an eye on your S3 bucket and observe files appearing as the events are processed.
 
-
 ### Assumptions
 
 - You have your AWS profile, IAM role, and credentials file location set correctly for the ectou-metadata service. Role and Profile need to be in a .env file.

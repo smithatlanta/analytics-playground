@@ -1,12 +1,15 @@
 # Analytics
 
-- The goal of this project is to allow us to do everything that segment does(minus the destinations)and to test it locally.  There are several pieces below that will help us do this.
+- The goal of this project is to allow us to run tests on an analytics platform.  
+- I know you can replay events and use varous other means to test an analytics platform but all of this is just something I've had bouncing around in my head and I'd like to see if I can code it.
 
 ## analytics-platform
 
-- This contains the code to spin up docker containers for kafka(including zookeeper, kafka, schema registry, and kafka connect)
+- This contains the code to spin up docker containers for a somewhat typical Kafka stack(including Zookeeper, Kafka, Schema Registry, and Connect) as well as an api service that pushes to Kafka.
 
-- The goal is to allow us to send data to kafka and have it write out to a file sink(local directory). We want to mimic how kinesis writes out to a firehose ends up in s3.
+- It also contains a client that pushes events to the api.
+
+- So the flow is client -> api -> kafka -> kafka connect -> local file system(or S3).
 
 ## analytics-website
 
@@ -14,11 +17,11 @@
 
 ## analytics-plan-runner
 
-- This will contain a client that takes the plan from the test website and executes it.
+- This will contain a worker that takes the plan from the analytics website and executes it.
 
 ## Notes
 
-- I know this stack completely misses the event reconciliation part of the workflow so I'm thinking about adding something that will ingest the events into postgresql and then surface some graphs(possibly in cube.js or some other visualization tool).
+- I know this stack completely misses the event reconciliation part of the workflow so I'm thinking about adding something that will ingest the events into postgresql and then surface some graphs(possibly via cube.js or some other visualization tool).
 
 - In a real world, high event volume stack, I would probably have a process that loads the events into a Snowflake(or other columnar database) and then use a tool like Looker(or tableau) to view the results.
 
