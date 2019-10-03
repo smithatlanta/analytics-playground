@@ -6,6 +6,8 @@ import (
 	"gopkg.in/segmentio/analytics-go.v3"
 )
 
+// This will send a batch of 100 messages at a 30 second interval.
+// They will all be the same message initially.
 func main() {
 	client, _ := analytics.NewWithConfig("h97jamjwbh", analytics.Config{
 		Endpoint:  "http://localhost:8080",

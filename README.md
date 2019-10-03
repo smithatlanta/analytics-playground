@@ -13,7 +13,7 @@
 
 ## analytics-test-client
 
-- This contains a test go client to test sending segment events to the analytics service.  This is using a hacked analytics-go segment library to do this.
+- This contains a test go client to test sending segment events to the analytics service.  This is using the standard analytics-go segment library with a custom url to do this.
 
 ## analytics-test-website
 

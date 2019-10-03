@@ -1,11 +1,38 @@
 version: '2'
+networks:
+  default:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 169.254.169.0/16
+         gateway: 169.254.169.1                    
 services:
+  role:
+    image: quay.io/turner/ectou-metadata
+    ports:
+    - 9000:80
+    environment:
+
+      # the role you want your container to assume
+      ROLE: ${ROLE}
+
+      # the local profile you want to use to assume the role
+      AWS_PROFILE: ${AWS_PROFILE}
+
+    volumes:
+      # typical location of your local AWS credentials file
+      - $HOME/.aws/credentials:/root/.aws/credentials:ro
+    networks:
+      default:
+        ipv4_address: 169.254.169.254
   zookeeper:
     image: zookeeper
     restart: always
     hostname: zoo1
     ports:
       - 2181:2181
+    networks:
+      - default
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
@@ -13,9 +40,11 @@ services:
     image: confluentinc/cp-kafka  
     ports:
       - "9092:9092"
+    networks:
+      - default
     environment:
       # KAFKA_ADVERTISED_HOST_NAME: host.docker.internal
-      KAFKA_CREATE_TOPICS: "test:1:1,quickstart-offsets:1:1,quickstart-config:1:1,quickstart-status:1:1,quickstart-datain:1:1,quickstart-dataout:1:1"
+      KAFKA_CREATE_TOPICS: "quickstart-config:1:1,quickstart-offsets:1:1,quickstart-status:1:1,events:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://host.docker.internal:9092
       KAFKA_BROKER_ID: 2
@@ -26,17 +55,23 @@ services:
     image: confluentinc/cp-schema-registry:latest
     ports:
       - "8081:8081"
+    networks:
+      - default
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
       SCHEMA_REGISTRY_HOST_NAME: "localhost"
       SCHEMA_REGISTRY_LISTENERS: "http://localhost:8081"
-  kafka-connect:
+  kafka-connect-file:
     image: confluentinc/cp-kafka-connect:latest
     ports:
       - "8083:8083"
+    networks:
+      - default
     environment:    
       CONNECT_BOOTSTRAP_SERVERS: "kafka:9092"
       CONNECT_REST_PORT: 8083
+      CONNECT_REST_HOST_NAME: "kafka-connect-file"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect-file"
       CONNECT_GROUP_ID: "quickstart"
       CONNECT_CONFIG_STORAGE_TOPIC: "quickstart-config"
       CONNECT_OFFSET_STORAGE_TOPIC: "quickstart-offsets"
@@ -49,23 +84,22 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_INTERNAL_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "schema-registry:8081"
       CONNECT_INTERNAL_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "schema-registry:8081"
-      CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
-      CONNECT_LOG4J_ROOT_LOGLEVEL: ERROR
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
-      CONNECT_LOG4J_LOGGERS:org.reflections: ERROR
+      CONNECT_LOG4J_LOGGERS:org.reflections: INFO
       CONNECT_PLUGIN_PATH: "/usr/share/java"
-      CONNECT_REST_HOST_NAME: "kafka-connect"
     volumes:      
       - /tmp/quickstart:/tmp/quickstart
   analytics-service:
     image: analytics-service
     ports:
       - "8080:8080"
+    networks:
+      - default
     environment:
       KAFKA_URL: "kafka:9092"
       KAFKA_TOPIC: "events"

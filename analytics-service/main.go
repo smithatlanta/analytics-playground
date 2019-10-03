@@ -19,7 +19,6 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 // batchpost -- To handle identify calls from the client
 func batchpost(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.Request) {
 	return http.HandlerFunc(func(wrt http.ResponseWriter, req *http.Request) {
-		log.Println(req.Body)
 		body, err := ioutil.ReadAll(req.Body)
 		if err != nil {
 			log.Fatalln(err)
@@ -28,6 +27,8 @@ func batchpost(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.Reques
 			Key:   []byte(fmt.Sprintf("address-%s", req.RemoteAddr)),
 			Value: body,
 		}
+		log.Println(msg)
+
 		err = kafkaWriter.WriteMessages(req.Context(), msg)
 
 		if err != nil {
@@ -37,6 +38,7 @@ func batchpost(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.Reques
 	})
 }
 
+// get access to kafka
 func getKafkaWriter(kafkaURL, topic string) *kafka.Writer {
 	return kafka.NewWriter(kafka.WriterConfig{
 		Brokers:  []string{kafkaURL},
