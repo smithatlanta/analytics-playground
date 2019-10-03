@@ -1,4 +1,4 @@
-# Analytics Testing Platform(Just starting to work on this)
+# Analytics Test Website
 
 - The idea here is to create a test plan to execute against the analytics platform.  
 - The test plan would include the following:
