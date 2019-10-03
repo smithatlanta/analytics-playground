@@ -20,6 +20,10 @@
 
 - This will eventually contain a website that will allow us to test the analytics platform using many different scenarios.
 
+## analytics-plan-runner
+
+- This will contain a client that takes the plan from the test website and executes it.
+
 ## Version 1 Arch
 
 ![alt text](./arch_images/AnalyticsPlatformLocal_8_30_19.jpg)
