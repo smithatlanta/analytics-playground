@@ -15,7 +15,7 @@
 
 ## How to start things up
 
-1. Go to the analytics-service directory first and build that service.
+1. Go to the api-service directory first and build that service.
     - This is the go web service that pushes data to kafka.
 
 2. Create a .env file in the analytics-platform directory with 2 values:
@@ -55,7 +55,11 @@
     curl -s -X GET http://localhost:8083/connectors/quickstart-file-sink/status
     ```
 
-8. This destroys the stack(zookeeper, kafka, kafka connect, schema registry, and analytics service).
+8. Go to the eventtest-client and run the go program to generate events(maybe several times).
+
+9. Tail the /tmp/quickstart/file/output.txt file and watch the events populate the file.
+
+10. This destroys the stack(zookeeper, kafka, kafka connect, schema registry, and analytics service).
 
     ```bash
     docker-compose down
@@ -63,7 +67,7 @@
 
 ## How to have kafka connect send to S3 instead of the local file system
 
-1. Run the following command(after your stack is up and running) to have kafka connect forward items in a topic to S3:
+1. Run the following command(after your stack is up and running) to have kafka connect forward items in a topic to an S3 bucket:
 
     ```bash
     curl -X POST -H "Content-Type: application/json"
@@ -90,6 +94,11 @@
     ```bash
     curl -s -X GET http://localhost:8083/connectors/aws-s3-sink-no-avro/status
     ```
+
+3. Go to the eventtest-client and run the go program to generate events(maybe several times).
+
+4. Keep an eye on your S3 bucket and observe files appearing as the events are processed.
+
 
 ### Assumptions
 

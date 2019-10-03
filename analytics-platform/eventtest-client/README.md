@@ -1,4 +1,4 @@
-# analytics-test-client
+# eventtest-client
 
-- This uses a slightly tweaked version of analytics-go to send track events to the analytics service.
+- This contains a test go client to test sending segment events to the api service.  This is using the standard analytics-go segment library with a custom url(of the analytics service) to do this.
 - Just run it using: go run main.go

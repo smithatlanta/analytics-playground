@@ -8,15 +8,7 @@
 
 - The goal is to allow us to send data to kafka and have it write out to a file sink(local directory). We want to mimic how kinesis writes out to a firehose ends up in s3.
 
-## analytics-service
-
-- This contains 2 REST endpoints(batchpost and healthcheck) to allow clients to call identify and track.  It uses gorilla mux and kafka-go.
-
-## analytics-test-client
-
-- This contains a test go client to test sending segment events to the analytics service.  This is using the standard analytics-go segment library with a custom url(of the analytics service) to do this.
-
-## analytics-test-website
+## analytics-website
 
 - This will eventually contain a website that will allow us to test the analytics platform using many different scenarios.
 
