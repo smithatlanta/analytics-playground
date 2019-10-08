@@ -7,6 +7,8 @@
 
 - This contains the code to spin up docker containers for a somewhat typical Kafka stack(including Zookeeper, Kafka, Schema Registry, and Connect) as well as an api service that publishes to a kafka topic.
 
+- I haven't done alot with Kafka so this is an opportunity to learn something new.
+
 - It also contains a client that pushes events to the api so you can do some simple testing.
 
 - So the flow is client -> api -> kafka -> kafka connect -> local file system(or S3).
