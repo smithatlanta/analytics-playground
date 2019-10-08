@@ -1,4 +1,4 @@
-# Analytics
+# Analytics Playground
 
 - The goal of this project is to allow us to run tests on an analytics platform.  
 - I know you can replay events and use varous other means to test an analytics platform but this project is just something I've had bouncing around in my head and I'd like to see if I can code it.
