@@ -20,9 +20,11 @@
 - Ability to add / remove users.
 - Ability to generate a specific number of users(user1, user2…)
 
-#### Optional
+##### Table design
 
-- Ability to specify a user as mobile or web?
+tblUser
+userid - identity
+username - varchar(20)
 
 ### Event Management
 
@@ -33,7 +35,14 @@
 
 #### Optional
 
-- Ability to generate events off of a template.
+- Ability to generate events off of a template(or tracking plan)
+
+##### Table design
+
+tblEvent
+eventid - identity
+eventname - varchar(20)
+template - varchar(255)
 
 ### Cohort Management
 
@@ -42,13 +51,36 @@
 - Ability to create / delete cohort groups.
 - Ability to add / remove users / percentage of users to cohort group.
 
+##### Table design
+
+tblCohort
+cohortid - identity
+cohortname - varchar(20)
+
+tblCohortUser
+cohortid
+userid
+
 ### Experiment Management
 
 #### Required
 
 - Ability to create / delete experiments.
 - Ability to add / remove events to an experiment.
-- Ability to add / remove cohort groups to an experiment.
+
+##### Table design
+
+tblExperiment
+experimentid - identity
+experimentname - varchar(20)
+
+tblExperimentCohort
+experimentid
+cohortid
+
+tblExperimentEvent
+experimentid
+eventid
 
 ### Plan Management
 
@@ -63,5 +95,21 @@
     - Round Robin would be user1 gets sent all the events on the plan then user2 gets sent all the events on the plan…
     - Random would be user1 gets sent event10 then user12 gets sent event25. Some users could get more events this way.
 
-**We need a way to take the Experiments above and see the results once they have flowed through the analytics platform.**
+##### Table design
 
+tblPlan
+planid - identity
+planname - varchar(20)
+
+tblPlanUser
+planid
+userid
+
+tblPlanEvent
+planid
+eventid
+eventcount
+
+## Thoughts
+
+- I am keeping the concept of cohorts and experiments separate from the plan because I think they work better loosely coupled.  This may change.
