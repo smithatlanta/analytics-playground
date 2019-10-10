@@ -97,18 +97,23 @@ eventid
 
 ##### Table design
 
+```
 tblPlan
+
 planid - identity
 planname - varchar(20)
+sendeventtype - roundrobin or random
+planstate - new, execute, inprogress, or complete
+```
+```
+tblPlanEventUser
 
-tblPlanUser
-planid
-userid
-
-tblPlanEvent
-planid
-eventid
-eventcount
+planeventuserid - identity
+planid - foreign key
+eventid - foreign key
+userid - foriegn key
+eventcount - int
+```
 
 ## Thoughts
 
