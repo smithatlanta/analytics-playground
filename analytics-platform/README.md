@@ -34,13 +34,13 @@
 4. Create the mountpoint so we can see the output of the file sink.
 
     ```bash
-    docker exec analytics-platform_kafka-connect_1 mkdir -p /tmp/quickstart/file
+    docker exec analytics-platform_kafka_connect_file_1 mkdir -p /tmp/quickstart/file
     ```
 
 5. Creates the actual file the output of the file sink will go into.
 
     ```bash
-    docker exec analytics-platform_kafka-connect_1 touch /tmp/quickstart/file/output.txt
+    docker exec analytics-platform_kafka_connect_file_1 touch /tmp/quickstart/file/output.txt
     ```
 
 6. Creates the file sink in kafka connect.  In practice this would be part of the container build but here we have the rest api exposed so we can tinker.
