@@ -12,11 +12,11 @@ func main() {
 	client, _ := analytics.NewWithConfig("h97jamjwbh", analytics.Config{
 		Endpoint:  "http://localhost:8080",
 		Interval:  30 * time.Second,
-		BatchSize: 100,
+		BatchSize: 1000,
 		Verbose:   true,
 	})
 
-	done := time.After(3 * time.Second)
+	done := time.After(120 * time.Second)
 	tick := time.Tick(50 * time.Millisecond)
 
 out:

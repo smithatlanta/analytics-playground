@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	kafka "github.com/segmentio/kafka-go"
+	kafka "gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
 // healthCheck -- To provide a response for the healthcheck
@@ -17,34 +17,43 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 // batchpost -- To handle identify calls from the client
-func batchpost(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.Request) {
+func batchpost(producer *kafka.Producer, topic string) func(http.ResponseWriter, *http.Request) {
 	return http.HandlerFunc(func(wrt http.ResponseWriter, req *http.Request) {
 		body, err := ioutil.ReadAll(req.Body)
 		if err != nil {
 			log.Fatalln(err)
 		}
-		msg := kafka.Message{
-			Key:   []byte(fmt.Sprintf("address-%s", req.RemoteAddr)),
-			Value: body,
-		}
-		log.Println(msg)
 
-		err = kafkaWriter.WriteMessages(req.Context(), msg)
+		deliveryChan := make(chan kafka.Event)
 
+		err = producer.Produce(&kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+			Value:          body,
+			Headers:        []kafka.Header{{Key: "myTestHeader", Value: []byte("header values are binary")}},
+		}, deliveryChan)
 		if err != nil {
-			wrt.Write([]byte(err.Error()))
-			log.Fatalln(err)
+			log.Print(err)
+		}
+
+		e := <-deliveryChan
+		m := e.(*kafka.Message)
+
+		if m.TopicPartition.Error != nil {
+			log.Print(m.TopicPartition.Error)
+		} else {
+			log.Printf("info", "Delivered message", "topic", *m.TopicPartition.Topic, "partition", m.TopicPartition.Partition, "offset", m.TopicPartition.Offset)
 		}
 	})
 }
 
 // get access to kafka
-func getKafkaWriter(kafkaURL, topic string) *kafka.Writer {
-	return kafka.NewWriter(kafka.WriterConfig{
-		Brokers:  []string{kafkaURL},
-		Topic:    topic,
-		Balancer: &kafka.LeastBytes{},
-	})
+func getKafkaProducer(kafkaURL string) *kafka.Producer {
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": kafkaURL})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return producer
 }
 
 func main() {
@@ -56,12 +65,12 @@ func main() {
 	log.Printf("KAFKA_TOPIC: %s", kafkaTopic)
 
 	// get kafka writer using environment variables.
-	kafkaWriter := getKafkaWriter(kafkaURL, kafkaTopic)
+	kafkaProducer := getKafkaProducer(kafkaURL)
 
-	defer kafkaWriter.Close()
+	defer kafkaProducer.Close()
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/healthcheck", healthCheck).Methods("GET")
-	router.HandleFunc("/v1/batch", batchpost(kafkaWriter)).Methods("POST")
+	router.HandleFunc("/v1/batch", batchpost(kafkaProducer, kafkaTopic)).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
